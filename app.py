@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
-from utils import analizar_piel, es_rostro_valido
+from utils_nocv2 import analizar_piel, es_rostro_valido
 from datetime import datetime
 import random
 from utils_db_mysql import crear_db, guardar_diagnostico, guardar_cuestionario, cargar_diagnostico, cargar_cuestionario
