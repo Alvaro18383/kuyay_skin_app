@@ -1,40 +1,27 @@
-import cv2
 import numpy as np
 from PIL import Image
 import hashlib
 
 
 def es_rostro_valido(imagen):
-    """Valida si hay rostro humano real en la imagen."""
+    """Simula validación de rostro sin usar OpenCV (compatible con Streamlit Cloud)."""
     img = np.array(imagen.convert('RGB'))
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    alto, ancho = img.shape[:2]
 
-    # Convertir a escala de grises
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    brillo = img[:, :, :3].mean()
+    variacion = img.std()
 
-    # Cargar el clasificador de rostro
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
-    rostros = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-
-    # ✅ Condición 1: debe detectar al menos un rostro
-    hay_rostro = len(rostros) > 0
-
-    # ✅ Condición 2: la imagen debe tener suficiente variación (para que no sea un fondo plano)
-    variacion = img.std() > 60
-
-    if hay_rostro and variacion:
+    # Validaciones mínimas: imagen suficientemente grande, con luz y contraste
+    if alto >= 150 and ancho >= 150 and brillo > 50 and variacion > 60:
         return True
     else:
         return False
 
 
 def analizar_piel(imagen):
-    """Análisis de piel consistente usando hash."""
+    """Devuelve un tipo de piel fijo basado en el hash para que sea consistente."""
 
     img = np.array(imagen.convert('RGB'))
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-
     hash_imagen = hashlib.md5(img).hexdigest()
 
     tipos_piel = ["Grasa", "Seca", "Mixta", "Sensible", "Deshidratada", "Rosácea", "Normal"]
@@ -52,5 +39,4 @@ def analizar_piel(imagen):
     }
 
     descripcion = descripciones[tipo_piel]
-
     return tipo_piel, descripcion
